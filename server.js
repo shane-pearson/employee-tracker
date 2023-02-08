@@ -2,28 +2,23 @@ const inquirer = require('inquirer');
 const fs = require('fs');
 const mysql = require('mysql2');
 
-const PORT = process.env.PORT || 3001;
-const app = express();
 
-// Express middleware
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-
-// Connect to database
 const db = mysql.createConnection(
   {
     host: 'localhost',
-    // MySQL Username
     user: 'root',
-    // TODO: Add MySQL Password
-    password: '',
+    password: process.env.PW,
     database: 'employees_db'
   },
   console.log(`Connected to the employees_db database.`)
 );
 
-const promptUser = () => {
-    return inquirer.prompt([
+db.connect(err => {
+    if (err) throw err
+})
+
+// function promptUser() {
+    inquirer.prompt([
       {
         type: 'list',
         name: 'name',
@@ -50,11 +45,14 @@ const promptUser = () => {
         }
     }) 
 
-};
+// };
+
 
 viewEmployees = () => {
-
-
+    db.query(`SELECT * FROM employee`, (err, res) => {
+        console.table(res);
+    })
+  promptUser()
 }
 
 addEmployee = () => {
@@ -93,29 +91,8 @@ quit = () => {
 }
 
 
+promptUser()
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
